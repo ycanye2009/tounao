@@ -24,15 +24,14 @@ var (
 
 func init() {
 
-	port = *flag.Int("port", 8989, "-port=8989")
-	mode = *flag.String("mode", "manual", "-mode=manual 手动点击 or -mode=auto ADB自动点击")
+	flag.IntVar(&port, "port", 8989, "-port=8989")
+	flag.StringVar(&mode, "mode", "manual", "-mode=manual 手动点击 or -mode=auto ADB自动点击")
 	if mode != `auto` {
 		mode = `manual`
 		util.Auto = false
 	} else {
 		util.Auto = true
 	}
-
 
 	proxy = goproxy.NewProxyHttpServer()
 	proxy.OnRequest().HandleConnect(goproxy.AlwaysMitm)
