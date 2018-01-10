@@ -10,11 +10,11 @@ import (
 	"strconv"
 	"github.com/elazarl/goproxy"
 	"fmt"
-	"wangzhe/util"
+	"tounao/util"
 	"time"
 )
 
-var cache = make(map[string]Question)
+var questions = make(map[string]Question)
 
 var tapSwitch = false
 
@@ -35,14 +35,14 @@ func Injection(bytes []byte, ctx *goproxy.ProxyCtx) (data []byte) {
 	} else if strings.Contains(content, "quiz") && strings.Contains(content, "options") {
 		data = injectQuestionResponse(bytes, ctx)
 	} else if strings.Contains(content, "score") && strings.Contains(content, "totalScore") {
-		go injectChooseResponse(bytes)
+		go cacheChooseResponse(bytes)
 	}
 
 	return
 }
 
 //收到结果
-func injectChooseResponse(bytes []byte) {
+func cacheChooseResponse(bytes []byte) {
 
 	var resp ChooseResp
 
@@ -50,14 +50,12 @@ func injectChooseResponse(bytes []byte) {
 
 	cacheKey := fmt.Sprintf("roomID=%s", strconv.Itoa(resp.Data.RoomID))
 
-	question := cache[cacheKey]
+	question := questions[cacheKey]
 
 	if question.Quiz != "" {
-
 		question.Answer = question.Options[resp.Data.Answer-1]
-		pushAnswerToCache(question)
-
-		delete(cache, cacheKey)
+		cache(question)
+		delete(questions, cacheKey)
 	}
 
 	if resp.Data.Num == 5 {
@@ -78,7 +76,7 @@ func injectQuestionResponse(bytes []byte, ctx *goproxy.ProxyCtx) (data []byte) {
 
 	cacheKey := ctx.UserData.(string)
 
-	cache[cacheKey] = NewQuestion(origin)
+	questions[cacheKey] = NewQuestion(origin)
 
 	start := time.Now()
 
@@ -101,7 +99,7 @@ func injectQuestionResponse(bytes []byte, ctx *goproxy.ProxyCtx) (data []byte) {
 
 		page := search(resp.Data.Quiz)
 
-		//如果题干中包含 '不' 字结果反向取
+		//如果题干中包含 否定字眼 结果取反
 		var max, min, reverse = 0, 65535,
 			strings.Contains(resp.Data.Quiz, "不是") ||
 				strings.Contains(resp.Data.Quiz, "不属于") ||
@@ -113,7 +111,6 @@ func injectQuestionResponse(bytes []byte, ctx *goproxy.ProxyCtx) (data []byte) {
 			grade := strings.Count(page, option)
 
 			//log.Println(option + "加了" + strconv.Itoa(grade) + "权重")
-
 			if len(words) > 1 {
 				for _, word := range words {
 					if len(word) > 1 {
@@ -143,9 +140,9 @@ func injectQuestionResponse(bytes []byte, ctx *goproxy.ProxyCtx) (data []byte) {
 
 	}
 
-	end := time.Now()
-	delta := end.Sub(start)
-	//log.Printf("查找答案耗时: %s\n", delta)
+	delta := time.Now().Sub(start)
+
+	log.Printf("查找答案耗时: %s\n", delta)
 
 	tap(guss, (3333*time.Millisecond)-delta)
 
@@ -160,9 +157,8 @@ func injectQuestionResponse(bytes []byte, ctx *goproxy.ProxyCtx) (data []byte) {
 	return
 }
 
-// 循环点按直到返回结果，不同分辨率按钮位置不同
+// 循环点按直到返回结果，不同分辨率按钮位置不同, 需要延时触发
 func tap(i int, delay time.Duration) {
-	log.Println("延时点按", string(97+i), delay)
 	go func() {
 		time.Sleep(delay)
 		times := 1
@@ -182,8 +178,7 @@ func tap(i int, delay time.Duration) {
 				break
 			}
 			times++
-
-			//遇到特殊情况，对方退出，需要重新进入游戏
+			//遇到特殊情况，需要重新进入游戏
 			if times > 10 {
 				gameRestart()
 			}
@@ -195,9 +190,8 @@ func tap(i int, delay time.Duration) {
 //答题完毕后点击 继续游戏 ，但是这里可能会遇到弹出升级框的情况，有待优化
 func gameRestart() {
 	go func() {
-		time.Sleep(11 * time.Second)
+		time.Sleep(12 * time.Second)
 		util.RunWithAdb("shell", "input tap 540 1440")
-		//time.Sleep(2 * time.Second)
 		util.RunWithAdb("shell", "input tap 540 1740")
 	}()
 }

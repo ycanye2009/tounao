@@ -58,7 +58,7 @@ func fetchAnswerFromCache(quiz string) (answer string) {
 	return answer
 }
 
-func pushAnswerToCache(question Question) {
+func cache(question Question) {
 
 	s := fmt.Sprintf("INSERT INTO questions(quiz, school, type, options, answer) VALUES ('%s','%s','%s','%s','%s')",
 		question.Quiz, question.School, question.Type, question.Options, question.Answer)
