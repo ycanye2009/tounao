@@ -69,29 +69,23 @@ func pushAnswerToCache(question Question) {
 func loadAll() []Question {
 
 	questions := make([]Question, 0)
+	rows, _ := db.Query("SELECT * FROM questions")
 
-	if db != nil {
-		rows, _ := db.Query("SELECT * FROM questions")
+	if rows != nil {
+		defer rows.Close()
+		for rows.Next() {
+			question := Question{}
+			var q, s, t, o, a string
+			rows.Scan(&q, &s, &t, &o, &a)
 
-		if rows != nil {
-			defer rows.Close()
-			for rows.Next() {
-				question := Question{}
-				var q, s, t, o, a string
-				rows.Scan(&q, &s, &t, &o, &a)
-
-				question.Quiz = q
-				question.School = s
-				question.Type = t
-				json.Unmarshal([]byte(o), &question.Options)
-				question.Answer = a
-				questions = append(questions, question)
-				//log.Printf("q:%s,s:%s,t:%s,o:%s,a:%s\n", q, s, t, o, a)
-			}
+			question.Quiz = q
+			question.School = s
+			question.Type = t
+			json.Unmarshal([]byte(o), &question.Options)
+			question.Answer = a
+			questions = append(questions, question)
+			//log.Printf("q:%s,s:%s,t:%s,o:%s,a:%s\n", q, s, t, o, a)
 		}
-
-	} else {
-		log.Panicln("数据库未连接")
 	}
 
 	return questions

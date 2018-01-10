@@ -195,7 +195,7 @@ func tap(i int, delay time.Duration) {
 //答题完毕后点击 继续游戏 ，但是这里可能会遇到弹出升级框的情况，有待优化
 func gameRestart() {
 	go func() {
-		time.Sleep(10 * time.Second)
+		time.Sleep(11 * time.Second)
 		util.RunWithAdb("shell", "input tap 540 1440")
 		//time.Sleep(2 * time.Second)
 		util.RunWithAdb("shell", "input tap 540 1740")

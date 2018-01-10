@@ -18,6 +18,7 @@ var (
 	proxy *goproxy.ProxyHttpServer
 )
 
+
 func init() {
 	proxy = goproxy.NewProxyHttpServer()
 	proxy.OnRequest().HandleConnect(goproxy.AlwaysMitm)
@@ -64,7 +65,7 @@ func init() {
 }
 
 func main() {
-	go Run("8888")
+	go Run("8989")
 	sigs := make(chan os.Signal, 1)
 	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
 	<-sigs
@@ -79,14 +80,14 @@ func Run(port string) {
 		util.Check(e)
 	}()
 
-	//go func() {
-	//	crtSever := http.NewServeMux()
-	//	crtSever.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-	//		w.Header().Set("Content-Disposition", "attachment; filename=ca.crt")
-	//		w.Header().Set("Content-Type", "application/octet-stream")
-	//		w.Write(goproxy.CA_CERT)
-	//	})
-	//	e := http.ListenAndServe(":8080", crtSever)
-	//	util.Check(e)
-	//}()
+	go func() {
+		crtSever := http.NewServeMux()
+		crtSever.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+			w.Header().Set("Content-Disposition", "attachment; filename=ca.crt")
+			w.Header().Set("Content-Type", "application/octet-stream")
+			w.Write(goproxy.CA_CERT)
+		})
+		e := http.ListenAndServe(":8080", crtSever)
+		util.Check(e)
+	}()
 }
