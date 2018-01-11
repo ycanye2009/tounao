@@ -11,6 +11,14 @@
 6. 不同的分辨率需要修改选代码中点击的坐标，因网络情况的不同还可适当调整按钮点击的延时时间，从而提高得分
 7. 题库数据越多，可以命中的概率越高,fork本项目你就拥有了2000+题库
 
+# 环境依赖
+```
+echo $GOPATH
+git clone git@github.com:golang/net.git $(echo "$GOPATH/src/golang.org/x/net")
+go get github.com/mattn/go-sqlite3
+go get github.com/elazarl/goproxy
+go get github.com/huichen/sego
+```
 
 # 功能
 1. 分词权重
