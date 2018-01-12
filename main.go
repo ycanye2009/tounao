@@ -25,7 +25,7 @@ var (
 func init() {
 
 	flag.IntVar(&port, "port", 8989, "-port=8989")
-	flag.StringVar(&mode, "mode", "manual", "-mode=manual 手动点击 or -mode=auto ADB自动点击")
+	flag.StringVar(&mode, "mode", "manual", "-mode=manual or -mode=auto")
 	if mode != `auto` {
 		mode = `manual`
 		util.Auto = false
@@ -40,6 +40,8 @@ func init() {
 	//请求拦截
 	requestHandle := func(request *http.Request, ctx *goproxy.ProxyCtx) (req *http.Request, resp *http.Response) {
 		req = request
+
+		//log.Println(ctx.Req.URL)
 
 		if ctx.Req.URL.Path == `/question/fight/findQuiz` || ctx.Req.URL.Path == `/question/fight/choose` {
 
