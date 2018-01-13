@@ -59,11 +59,13 @@ func fetchAnswerFromCache(quiz string) (answer string) {
 }
 
 func cache(question Question) {
-
-	s := fmt.Sprintf("INSERT INTO questions(quiz, school, type, options, answer) VALUES ('%s','%s','%s','%s','%s')",
+	s := fmt.Sprintf("REPLACE INTO questions(quiz, school, type, options, answer) VALUES ('%s','%s','%s','%s','%s')",
 		question.Quiz, question.School, question.Type, question.Options, question.Answer)
-	db.Exec(s)
+	_,e := db.Exec(s)
 
+	if e != nil {
+		 log.Println(e)
+	}
 }
 
 func loadAll() []Question {

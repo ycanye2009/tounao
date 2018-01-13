@@ -144,7 +144,7 @@ func injectQuestionResponse(bytes []byte, ctx *goproxy.ProxyCtx) (data []byte) {
 
 	log.Printf("查找答案耗时: %s\n", delta)
 
-	tap(guss, (3333*time.Millisecond)-delta)
+	tap(guss, (3200*time.Millisecond)-delta)
 
 	log.Println(resp.Data.Quiz)
 
