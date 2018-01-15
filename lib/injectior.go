@@ -15,26 +15,28 @@ import (
 )
 
 var questions = make(map[string]Question)
-
-var tapSwitch = false
+var tapTask *time.Ticker
+var restartTask *time.Timer
 
 func Injection(bytes []byte, ctx *goproxy.ProxyCtx) (data []byte) {
 
 	data = bytes
 	content := string(bytes)
 
-	//log.Printf("path:%s\ncontent:%s", ctx.Req.URL.Path, content)
+	//log.Printf("path:%s\n content:%s", ctx.Req.URL.Path, content)
 
 	if strings.Contains(content, "roomID") && strings.Contains(content, "quizNum") {
-		//请求题目和发送答案的时候停止点击
-		tapSwitch = false
+		//请求题目和发送答案的时候停止点按
+		cancelTap()
 		values, _ := url.ParseQuery(content)
 		roomId, _ := strconv.Atoi(values.Get("roomID"))
 		cacheKey := fmt.Sprintf("roomID=%s", strconv.Itoa(roomId))
 		ctx.UserData = cacheKey
 	} else if strings.Contains(content, "quiz") && strings.Contains(content, "options") {
+		//获取到题目，将返回结果中注入答案,开始点击
 		data = injectQuestionResponse(bytes, ctx)
 	} else if strings.Contains(content, "score") && strings.Contains(content, "totalScore") {
+		//答题结束，协程处理
 		go cacheChooseResponse(bytes)
 	}
 
@@ -60,7 +62,7 @@ func cacheChooseResponse(bytes []byte) {
 
 	if resp.Data.Num == 5 {
 		log.Println("答题完毕！！！")
-		gameRestart()
+		gameRestart(12 * time.Second)
 	}
 
 	return
@@ -83,8 +85,6 @@ func injectQuestionResponse(bytes []byte, ctx *goproxy.ProxyCtx) (data []byte) {
 	answer := fetchAnswerFromCache(resp.Data.Quiz)
 
 	//收到题目开始点答案
-
-	tapSwitch = true
 
 	guss := 0
 
@@ -144,6 +144,7 @@ func injectQuestionResponse(bytes []byte, ctx *goproxy.ProxyCtx) (data []byte) {
 
 	log.Printf("查找答案耗时: %s\n", delta)
 
+	//延时点按
 	tap(guss, (3200*time.Millisecond)-delta)
 
 	log.Println(resp.Data.Quiz)
@@ -157,12 +158,21 @@ func injectQuestionResponse(bytes []byte, ctx *goproxy.ProxyCtx) (data []byte) {
 	return
 }
 
-// 循环点按直到返回结果，不同分辨率按钮位置不同, 需要延时触发
+
+
+//循环点按直到返回结果，不同分辨率按钮位置不同, 需要延时触发
 func tap(i int, delay time.Duration) {
+
 	go func() {
-		time.Sleep(delay)
-		times := 1
-		for tapSwitch {
+		//先取消点按
+		cancelTap()
+		//取消重启
+		cancelRestart()
+		//等待动画延时
+		time.Sleep(delay - 1*time.Second)
+
+		tapTask = time.NewTicker(1 * time.Second)
+		for _ = range tapTask.C {
 			switch i {
 			case 0:
 				util.RunWithAdb("shell", "input tap 540 1040")
@@ -177,23 +187,43 @@ func tap(i int, delay time.Duration) {
 				util.RunWithAdb("shell", "input tap 540 1640")
 				break
 			}
-			times++
-			//遇到特殊情况，需要重新进入游戏
-			if times > 10 {
-				gameRestart()
-			}
 		}
-	}()
 
+		//选择答案12秒后 没有再次触发点击事件则 重启游戏
+		gameRestart(12 * time.Second)
+	}()
+}
+
+//停止选择
+func cancelTap()  {
+	if tapTask != nil {
+		tapTask.Stop()
+	}
+}
+
+//取消游戏重启
+func cancelRestart() {
+	if restartTask != nil {
+		 restartTask.Stop()
+	}
 }
 
 //答题完毕后点击 继续游戏 ，但是这里可能会遇到弹出升级框的情况，有待优化
-func gameRestart() {
-	go func() {
-		time.Sleep(12 * time.Second)
+func gameRestart(delay time.Duration) {
+	if restartTask != nil {
+		restartTask.Stop()
+	}
+
+	restartTask = time.AfterFunc(delay, func() {
+		cancelTap()
+		//继续游戏 -> 重开
 		util.RunWithAdb("shell", "input tap 540 1440")
 		util.RunWithAdb("shell", "input tap 540 1740")
-	}()
+		//util.RunWithAdb("shell", "input tap 540 1240")
+		//util.RunWithAdb("shell", "input tap 540 1690")
+		//util.RunWithAdb("shell", "input tap 540 1240")
+		//util.RunWithAdb("shell", "input tap 540 1690")
+	})
 }
 
 func search(question string) string {

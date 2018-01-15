@@ -14,7 +14,7 @@ var segmenter sego.Segmenter
 var Auto = false
 
 func init() {
-	segmenter.LoadDictionary("data/dictionary.txt")
+	segmenter.LoadDictionary("vendor/github.com/huichen/sego/data/dictionary.txt")
 }
 
 func Check(e error) (bool) {
