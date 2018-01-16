@@ -14,10 +14,10 @@
 # 环境依赖
 ```
 echo $GOPATH
-git clone git@github.com:golang/net.git $(echo "$GOPATH/src/golang.org/x/net")
-go get github.com/mattn/go-sqlite3
-go get github.com/elazarl/goproxy
-go get github.com/huichen/sego
+git clone git@github.com:wansir/tounao.git $(echo "$GOPATH/src/tounao")
+cd  $(echo "$GOPATH/src/tounao")
+git submodule init
+git submodule update
 ```
 
 # 功能
