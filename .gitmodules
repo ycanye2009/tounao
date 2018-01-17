@@ -16,3 +16,6 @@
 [submodule "vendor/github.com/adamzy/cedar-go"]
 	path = vendor/github.com/adamzy/cedar-go
 	url = git@github.com:adamzy/cedar-go.git
+[submodule "vendor/github.com/coreos/goproxy"]
+	path = vendor/github.com/coreos/goproxy
+	url = git@github.com:coreos/goproxy.git
