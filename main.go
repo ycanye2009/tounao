@@ -106,7 +106,7 @@ func Run(port string) {
 	go func() {
 		log.Println("代理服务端口:", port)
 		log.Printf("请将手机连接至同一网络，并设置代理地址为%s:%s\n", util.HostIP(), port)
-		log.Printf("打开 %s 即可安装证书\n", util.HostIP())
+		log.Printf("打开http://%s 即可安装证书\n", util.HostIP())
 		log.Printf("当前模式为:%s\n", mode)
 
 		e := http.ListenAndServe(":"+port, proxy)
