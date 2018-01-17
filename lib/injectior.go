@@ -8,7 +8,7 @@ import (
 	"io/ioutil"
 	"strings"
 	"strconv"
-	"github.com/elazarl/goproxy"
+	"github.com/coreos/goproxy"
 	"fmt"
 	"tounao/util"
 	"time"
