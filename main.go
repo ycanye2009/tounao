@@ -37,13 +37,19 @@ func init() {
 	proxy.OnRequest().HandleConnect(goproxy.AlwaysMitm)
 	//proxy.Verbose = true
 
+	proxy.NonproxyHandler = http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		w.Header().Add("Content-Disposition", "attachment; filename=ca.crt")
+		w.Header().Add("Content-Type", "application/octet-stream")
+		w.Write(goproxy.CA_CERT)
+	})
+
 	//请求拦截
 	requestHandle := func(request *http.Request, ctx *goproxy.ProxyCtx) (req *http.Request, resp *http.Response) {
 		req = request
 
 		//log.Println(ctx.Req.URL)
 
-		if ctx.Req.URL.Path == `/question/fight/findQuiz` || ctx.Req.URL.Path == `/question/fight/choose` {
+		if ctx.Req.URL.Path == `/question/bat/findQuiz` || ctx.Req.URL.Path == `/question/bat/choose` {
 
 			requestBody, e := ioutil.ReadAll(req.Body)
 			if util.Check(e) {
@@ -64,14 +70,7 @@ func init() {
 	responseHandle := func(response *http.Response, ctx *goproxy.ProxyCtx) (resp *http.Response) {
 		resp = response
 
-		if ctx.Req.URL.Hostname() == `github.com` {
-			resp.StatusCode = 200
-			resp.Header.Add("Content-Disposition", "attachment; filename=ca.crt")
-			resp.Header.Add("Content-Type", "application/octet-stream")
-			resp.Body = ioutil.NopCloser(bytes.NewReader(goproxy.CA_CERT))
-		}
-
-		if ctx.Req.URL.Path == `/question/fight/findQuiz` || ctx.Req.URL.Path == `/question/fight/choose` {
+		if ctx.Req.URL.Path == `/question/bat/findQuiz` || ctx.Req.URL.Path == `/question/bat/choose` {
 			responseBody, e := ioutil.ReadAll(resp.Body)
 			if util.Check(e) {
 
@@ -95,7 +94,6 @@ func init() {
 func main() {
 
 	flag.Parse()
-
 	go Run(strconv.Itoa(port))
 	sigs := make(chan os.Signal, 1)
 	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
@@ -108,8 +106,9 @@ func Run(port string) {
 	go func() {
 		log.Println("代理服务端口:", port)
 		log.Printf("请将手机连接至同一网络，并设置代理地址为%s:%s\n", util.HostIP(), port)
-		log.Println("打开 https://github.com 即可安装证书")
+		log.Printf("打开 %s 即可安装证书\n", util.HostIP())
 		log.Printf("当前模式为:%s\n", mode)
+
 		e := http.ListenAndServe(":"+port, proxy)
 		util.Check(e)
 	}()
