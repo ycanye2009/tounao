@@ -1,0 +1,64 @@
+Failed to clone 'vendor/github.com/adamzy/cedar-go' a second time, aborting
+
+E:\mygo\src\tounao>git submodule init
+
+E:\mygo\src\tounao>git submodule update
+fatal: destination path 'E:/mygo/src/tounao/vendor/github.com/adamzy/cedar-go' a
+lready exists and is not an empty directory.
+fatal: clone of 'git@github.com:adamzy/cedar-go.git' into submodule path 'E:/myg
+o/src/tounao/vendor/github.com/adamzy/cedar-go' failed
+Failed to clone 'vendor/github.com/adamzy/cedar-go'. Retry scheduled
+fatal: destination path 'E:/mygo/src/tounao/vendor/github.com/coreos/goproxy' al
+ready exists and is not an empty directory.
+fatal: clone of 'git@github.com:coreos/goproxy.git' into submodule path 'E:/mygo
+/src/tounao/vendor/github.com/coreos/goproxy' failed
+Failed to clone 'vendor/github.com/coreos/goproxy'. Retry scheduled
+fatal: destination path 'E:/mygo/src/tounao/vendor/github.com/huichen/sego' alre
+ady exists and is not an empty directory.
+fatal: clone of 'git@github.com:huichen/sego.git' into submodule path 'E:/mygo/s
+rc/tounao/vendor/github.com/huichen/sego' failed
+Failed to clone 'vendor/github.com/huichen/sego'. Retry scheduled
+fatal: destination path 'E:/mygo/src/tounao/vendor/github.com/mattn/go-sqlite3'
+already exists and is not an empty directory.
+fatal: clone of 'git@github.com:mattn/go-sqlite3.git' into submodule path 'E:/my
+go/src/tounao/vendor/github.com/mattn/go-sqlite3' failed
+Failed to clone 'vendor/github.com/mattn/go-sqlite3'. Retry scheduled
+Cloning into 'E:/mygo/src/tounao/vendor/golang.org/x/net'...
+git@github.com: Permission denied (publickey).
+fatal: Could not read from remote repository.
+
+Please make sure you have the correct access rights
+and the repository exists.
+fatal: clone of 'git@github.com:golang/net.git' into submodule path 'E:/mygo/src
+/tounao/vendor/golang.org/x/net' failed
+Failed to clone 'vendor/golang.org/x/net'. Retry scheduled
+Cloning into 'E:/mygo/src/tounao/vendor/goproxy'...
+git@github.com: Permission denied (publickey).
+fatal: Could not read from remote repository.
+
+Please make sure you have the correct access rights
+and the repository exists.
+fatal: clone of 'git@github.com:elazarl/goproxy.git' into submodule path 'E:/myg
+o/src/tounao/vendor/goproxy' failed
+Failed to clone 'vendor/goproxy'. Retry scheduled
+fatal: destination path 'E:/mygo/src/tounao/vendor/github.com/adamzy/cedar-go' a
+lready exists and is not an empty directory.
+fatal: clone of 'git@github.com:adamzy/cedar-go.git' into submodule path 'E:/myg
+o/src/tounao/vendor/github.com/adamzy/cedar-go' failed
+Failed to clone 'vendor/github.com/adamzy/cedar-go' a second time, aborting
+
+E:\mygo\src\tounao>
+
+
+
+
+
+
+
+
+
+
+
+
+
+

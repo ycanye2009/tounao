@@ -1,4 +1,4 @@
-package main
+﻿package main
 
 import (
 	"github.com/coreos/goproxy"
@@ -25,7 +25,7 @@ var (
 func init() {
 
 	flag.IntVar(&port, "port", 8989, "-port=8989")
-	flag.StringVar(&mode, "mode", "manual", "-mode=manual or -mode=auto")
+	flag.StringVar(&mode, "mode", "auto", "-mode=manual or -mode=auto")
 	if mode != `auto` {
 		mode = `manual`
 		util.Auto = false
